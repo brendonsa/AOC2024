@@ -147,7 +147,6 @@ windows = sliding_window_view(data, window_shape)
 xmas = 0
 for i in range(windows.shape[0]):
     for j in range(windows.shape[1]):
-        # Extract the 3x3 window
         w = windows[i, j]
         if ''.join(np.diag(w)) in ['MAS', 'SAM'] and ''.join(np.diag(np.fliplr(w))) in ['MAS', 'SAM']:
             xmas += 1

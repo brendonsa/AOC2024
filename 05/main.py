@@ -1,4 +1,8 @@
 from collections import defaultdict
+import random
+import tqdm
+import numpy as np
+from itertools import permutations
 
 rules = open('rules.txt', 'r').read()
 rules = rules.split('\n')
