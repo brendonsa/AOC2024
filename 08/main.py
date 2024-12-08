@@ -46,12 +46,11 @@ for u in unique:
         oob = False
         i = 0
         # Antennas fall in same line so they are antinodes
-        pos_antinodes[a[0],a[1]] = True
-        pos_antinodes[b[0],b[1]] = True
         while not oob:
             # Same as before, but now place them every i times distance
-            i+=1
+            # i starts as 0 so if would add the antenna point
             antinode = a + i*diff
+            i+=1
             if(test_in_bounds(data,antinode)):
                 pos_antinodes[antinode[0],antinode[1]] = True
             else:
