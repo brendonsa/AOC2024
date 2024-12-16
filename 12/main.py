@@ -5,7 +5,6 @@ data = data.split('\n')
 
 data = [list(d) for d in data]
 visited = np.zeros((len(data), len(data[0])), dtype=bool)
-print(visited.shape)
 
 STEP_UP = (-1, 0)
 STEP_RIGHT = (0, 1)
@@ -66,7 +65,7 @@ def trim_and_pad(nparray):
     return padded_array
 
 
-def count_edges_from_right(visited):
+def count_edges_LR(visited):
     edge_positions = np.zeros_like(visited, dtype=bool)
     edge_positions = np.diff(visited, axis=1)
     edge_positions[edge_positions < 0] = 0
@@ -86,10 +85,10 @@ for i in range(len(data)):
             visited_this = np.logical_xor(visited_temp, visited)
             visited_this = trim_and_pad(visited_this)
             visited_this = visited_this.astype(int)
-            count_right = count_edges_from_right(visited_this)
-            count_up = count_edges_from_right(visited_this.T)
-            count_left = count_edges_from_right(visited_this[:, ::-1])
-            count_down = count_edges_from_right(visited_this[::-1].T)
+            count_right = count_edges_LR(visited_this)
+            count_up = count_edges_LR(visited_this.T)
+            count_left = count_edges_LR(visited_this[:, ::-1])
+            count_down = count_edges_LR(visited_this[::-1].T)
             sides = count_right+count_up+count_left+count_down
             score_second += sides*plot
 
