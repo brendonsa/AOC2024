@@ -114,54 +114,43 @@ while len(QUEUE_TEST) > 0:
     south_node_dis = distances[NODE_SOUTH[0]][NODE_SOUTH[1]]
     NODE_NORTH = (NODE[0]+NORTH[0], NODE[1]+NORTH[1])
     north_node_dis = distances[NODE_NORTH[0]][NODE_NORTH[1]]
+
     if abs(east_node_dis-west_node_dis) == 2 and abs(east_node_dis-dis_here) != 1:
-        for N in [NODE_EAST, NODE_WEST]:
-            NODE_N = tuple(N)
-            while True:
-                if NODE_N in SET_BEST:
-                    break
-                best_path[NODE_N[0]][NODE_N[1]] = 1
-                QUEUE_TEST.append(NODE_N)
-                SET_BEST.add(tuple(NODE_N))
-                NODE_N = (came_from[NODE_N[0]][NODE_N[1]]
-                          [0], came_from[NODE_N[0]][NODE_N[1]][1])
+        new_line = False
+        # THIS IS AN ASSUMPTION. Only check forks, not new paths. This SHOULD check the turns.
+        if not tuple(NODE_EAST) in SET_BEST and not tuple(NODE_WEST) in SET_BEST:
+            new_line = True
+        if not new_line:
+            for N in [NODE_EAST, NODE_WEST]:
+
+                NODE_N = tuple(N)
+                while True:
+                    if NODE_N in SET_BEST:
+                        break
+                    best_path[NODE_N[0]][NODE_N[1]] = 1
+                    QUEUE_TEST.append(NODE_N)
+                    SET_BEST.add(tuple(NODE_N))
+                    NODE_N = (came_from[NODE_N[0]][NODE_N[1]]
+                              [0], came_from[NODE_N[0]][NODE_N[1]][1])
 
     if abs(south_node_dis-north_node_dis) == 2 and abs(south_node_dis-dis_here) != 1:
-        for N in [NODE_SOUTH, NODE_NORTH]:
-            NODE_N = tuple(N)
-            while True:
-                if NODE_N in SET_BEST:
-                    break
-                best_path[NODE_N[0]][NODE_N[1]] = 1
-                QUEUE_TEST.append(NODE_N)
-                SET_BEST.add(tuple(NODE_N))
-                NODE_N = (came_from[NODE_N[0]][NODE_N[1]]
-                          [0], came_from[NODE_N[0]][NODE_N[1]][1])
-
-    # for d in directions:
-    #     new_node = (NODE[0]+d[0], NODE[1]+d[1])
-
-    #     if distances[new_node[0]][new_node[1]] == -1:
-    #         continue
-
-    #     if dis_here-distances[new_node[0]][new_node[1]] == -999:
-    #         NODE_N = tuple(new_node)
-    #         while True:
-    #             if NODE_N in SET_BEST:
-    #                 break
-    #             best_path[NODE_N[0]][NODE_N[1]] = 1
-    #             QUEUE_TEST.append(NODE_N)
-    #             SET_BEST.add(tuple(NODE_N))
-    #             NODE_N = (came_from[NODE_N[0]][NODE_N[1]]
-    #                       [0], came_from[NODE_N[0]][NODE_N[1]][1])
-
-        # if best_path[new_node[0]][new_node[1]] != 1:
-        #     SET_BEST.add(new_node)
-        #     QUEUE_TEST.append(new_node)
-        #     best_path[new_node[0]][new_node[1]] = 1
+        new_line = False
+        # THIS IS AN ASSUMPTION. Only check forks, not new paths. This SHOULD check the turns.
+        if not tuple(NODE_SOUTH) in SET_BEST and not tuple(NODE_NORTH) in SET_BEST:
+            new_line = True
+        if not new_line:
+            for N in [NODE_SOUTH, NODE_NORTH]:
+                NODE_N = tuple(N)
+                while True:
+                    if NODE_N in SET_BEST:
+                        break
+                    best_path[NODE_N[0]][NODE_N[1]] = 1
+                    QUEUE_TEST.append(NODE_N)
+                    SET_BEST.add(tuple(NODE_N))
+                    NODE_N = (came_from[NODE_N[0]][NODE_N[1]]
+                              [0], came_from[NODE_N[0]][NODE_N[1]][1])
 
 
-# Just subtract the wrong loops from answer lol
 print(np.sum(best_path)+1)
 plt.imshow(best_path)
 plt.show()
