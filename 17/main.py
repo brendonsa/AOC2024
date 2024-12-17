@@ -119,66 +119,25 @@ def regen_output(a):
             operation, operand = OPERATIONS[instructions[pointer]], instructions[pointer+1]
             pointer = operation(operand,pointer)
 
-a = 0
 OUTPUT.clear()
-possible_vals = defaultdict()
-for i in reversed(range(len(instructions))):
-    for x in range(9):
-        possible_a = a+(8**i)*x
+def build_solution(depth,a=0):
+    for x in range(8):
+        possible_a = a+(8**depth)*x
         regen_output(possible_a)
         if len(OUTPUT)!= len(instructions):
             continue
-        else:
-            if OUTPUT[i] == instructions[i]:
-                possible_vals.append(x)
-                a = possible_a
-                break
+        if OUTPUT[depth] == instructions[depth]:
+            if depth == 0:
+                return possible_a
+            else:
+                possible_a = build_solution(depth-1,possible_a)
+                if possible_a is None:
+                    continue
+                else:
+                    return possible_a
+    return None
+    
+
+depth = len(instructions)-1
+a = build_solution(depth)
 print(a)
-
-
-print(','.join(map(str,OUTPUT)))
-
-# pointer = 0
-# OUTPUT.clear()
-# while True:
-#     if pointer >= len(instructions):
-#         break
-#     else:
-#         operation, operand = OPERATIONS[instructions[pointer]], instructions[pointer+1]
-#         pointer = operation(operand,pointer)
-
-# print(','.join(map(str,OUTPUT)))
-
-
-# reset_registers(potential_A)
-# OUTPUT.clear()
-# from collections import defaultdict
-# POTENTIAL_NUMS = defaultdict(set)
-# while True:
-#     if potential_A == 10000000:
-#         print(POTENTIAL_NUMS)
-#         print(set.intersection(*POTENTIAL_NUMS.values()))
-#     if pointer >= len(instructions):
-#         if len(OUTPUT)!=len(instructions):
-#             OUTPUT.clear()
-#             potential_A+=1
-#             reset_registers(potential_A)
-#             pointer = 0
-#             continue
-#         if any(OUTPUT!=instructions):
-#             pointer = 0
-#             potential_A+=1
-#             OUTPUT.clear()
-#             reset_registers(potential_A)
-#             continue
-#         break
-#     else:
-#         operation, operand = OPERATIONS[instructions[pointer]], instructions[pointer+1]
-#         pointer = operation(operand,pointer)
-#         for idx, o in enumerate(OUTPUT):
-#             if instructions[idx] != o:
-#                 pointer = 100000
-#             if instructions[idx] == o:
-#                 POTENTIAL_NUMS[idx].add(potential_A)
-
-# print(potential_A)
