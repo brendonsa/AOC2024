@@ -100,12 +100,7 @@ def reset_registers(A):
     registers['B'].value=0
     registers['C'].value=0
 
-pointer = 0
-b = 0
-for a in range(len(instructions)):
-    b+=8**a
 
-b = 8**(len(instructions)-1)
 
 def regen_output(a):
     pointer = 0
