@@ -53,16 +53,18 @@ while len(QUEUE) > 0:
 print(distances[70, 70])
 
 
-def simulate_bytes(quantity):
-    mem_map = np.ones((71, 71))
-    for idx, d in enumerate(data):
-        if idx == quantity:
-            break
-        mem_map[d[1], d[0]] = 0
+def simulate_bytes(quantity, mem_map, known_path=None):
+    d = data[quantity]
+    mem_map[d[1], d[0]] = 0
     QUEUE = [start_point]
     distances = np.ones_like(mem_map) * -1
+    if known_path is not None:
+        if (d[1], d[0]) not in known_path:
+            distances[70, 70] = 1
+            return distances, mem_map, known_path
     distances[0, 0] = 0
     DISTANCES = [0]
+    comes_from = dict()
     while len(QUEUE) > 0:
         distances_min = np.argsort(DISTANCES)[0]
         dist_here = DISTANCES.pop(distances_min)
@@ -74,16 +76,33 @@ def simulate_bytes(quantity):
                 if mem_map[new_position[0], new_position[1]] == 0:
                     continue
                 if distances[new_position[0], new_position[1]] > dist_here+1 or distances[new_position[0], new_position[1]] == -1:
+                    comes_from[(new_position[0], new_position[1])
+                               ] = tuple(position)
                     distances[new_position[0], new_position[1]] = dist_here+1
                     DISTANCES.append(dist_here+1)
                     QUEUE.append(new_position)
-    return distances
+            if distances[70, 70] != -1:
+                QUEUE = []
+
+    pos = (70, 70)
+    path = [pos]
+    while (pos != (0, 0)):
+        try:
+            pos = comes_from[pos]
+            path.append(pos)
+        except KeyError:
+            # This is expected when there is actually no path
+            return distances, mem_map, path
+
+    return distances, mem_map, path
 
 
-for i in range(1024, len(data)):
-    d = simulate_bytes(i)
+path = None
+mem_map = np.ones((71, 71))
+for i in range(1023, len(data)):
+    d, mem_map, path = simulate_bytes(i, mem_map, path)
     if d[70, 70] == -1:
         break
 
 
-print(data[i-1])
+print(data[i])
