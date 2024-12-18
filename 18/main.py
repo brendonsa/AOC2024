@@ -70,6 +70,9 @@ def simulate_bytes(quantity, mem_map, known_path=None):
     comes_from = dict()
     while QUEUE:
         _, dist_here, position = heapq.heappop(QUEUE)
+        if position == (70, 70):
+            break
+
         for d in directions:
             new_position = (position[0]+d[0], position[1]+d[1])
 
@@ -84,8 +87,6 @@ def simulate_bytes(quantity, mem_map, known_path=None):
                         new_position[0]-70) + abs(new_position[1]-70)
                     heapq.heappush(
                         QUEUE, (dist_here+1+cityblock, dist_here+1, new_position))
-            if distances[70, 70] != -1:
-                QUEUE = []
 
     pos = (70, 70)
     path = [pos]
