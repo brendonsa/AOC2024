@@ -1,5 +1,8 @@
+import time
 from matplotlib import pyplot as plt
 import numpy as np
+
+import heapq
 
 data = open('input.txt', 'r').read()
 data = data.split('\n')
@@ -17,7 +20,7 @@ mem_map = np.ones((71, 71))
 for idx, d in enumerate(data):
     if idx == 1024:
         break
-    mem_map[d[1], d[0]] = 0
+    mem_map[d[0], d[1]] = 0
 
 distances = np.ones_like(mem_map) * -1
 start_point = (0, 0)
@@ -55,20 +58,18 @@ print(distances[70, 70])
 
 def simulate_bytes(quantity, mem_map, known_path=None):
     d = data[quantity]
-    mem_map[d[1], d[0]] = 0
-    QUEUE = [start_point]
+    mem_map[d[0], d[1]] = 0
     distances = np.ones_like(mem_map) * -1
     if known_path is not None:
-        if (d[1], d[0]) not in known_path:
+        if (d[0], d[1]) not in known_path:
             distances[70, 70] = 1
             return distances, mem_map, known_path
     distances[0, 0] = 0
-    DISTANCES = [0]
+    QUEUE = []
+    heapq.heappush(QUEUE, (0, 0, start_point))
     comes_from = dict()
-    while len(QUEUE) > 0:
-        distances_min = np.argsort(DISTANCES)[0]
-        dist_here = DISTANCES.pop(distances_min)
-        position = QUEUE.pop(distances_min)
+    while QUEUE:
+        _, dist_here, position = heapq.heappop(QUEUE)
         for d in directions:
             new_position = (position[0]+d[0], position[1]+d[1])
 
@@ -79,8 +80,10 @@ def simulate_bytes(quantity, mem_map, known_path=None):
                     comes_from[(new_position[0], new_position[1])
                                ] = tuple(position)
                     distances[new_position[0], new_position[1]] = dist_here+1
-                    DISTANCES.append(dist_here+1)
-                    QUEUE.append(new_position)
+                    cityblock = abs(
+                        new_position[0]-70) + abs(new_position[1]-70)
+                    heapq.heappush(
+                        QUEUE, (dist_here+1+cityblock, dist_here+1, new_position))
             if distances[70, 70] != -1:
                 QUEUE = []
 
@@ -99,10 +102,9 @@ def simulate_bytes(quantity, mem_map, known_path=None):
 
 path = None
 mem_map = np.ones((71, 71))
-for i in range(1023, len(data)):
+for i in range(len(data)):
     d, mem_map, path = simulate_bytes(i, mem_map, path)
     if d[70, 70] == -1:
         break
-
 
 print(data[i])
