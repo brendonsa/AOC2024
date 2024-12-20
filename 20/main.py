@@ -31,7 +31,7 @@ end_point = (end_point[0][0], end_point[1][0])
 distances[start_point] = 0
 QUEUE = []
 heapq.heappush(QUEUE, (0, start_point))
-
+# This actually is not needed as there is only one path guaranteed but whatever.
 while QUEUE:
     dist_here, position = heapq.heappop(QUEUE)
     if position == end_point:
@@ -47,6 +47,7 @@ while QUEUE:
                     QUEUE, (dist_here+1, new_position))
 
 
+# Just check if the distances around is shorter than 100 + offset
 end_position_dist = distances[end_point]
 a = 0
 for i in range(end_position_dist-100):
@@ -86,19 +87,23 @@ def apply_offsets_to_center(grid_shape, center, offsets):
     return valid_indices
 
 
-def calc_cityblock(pointA, pointB):
-    return np.sum(np.abs(pointA - pointB), axis=1)
+def calc_cityblock(pointA, pointsB):
+    # Calculate the cityblock distance between pointA and pointsB
+    # pointA is singular point, pointsB can be an array of points, so we need to return sum on the last axis
+    return np.sum(np.abs(pointA - pointsB), axis=1)
 
 
 cityblock = build_cityblock_offsets(20)
-# distances[np.where(distances == -1)] = -1
 a = 0
+# Apply first part logic here but instead of just checking around the points around, check the whole window by using cityblock distance
+# Don't forget to offset the distance!
 for i in range(end_position_dist-100):
     position_curr = np.where(distances == i)
     position_curr = (position_curr[0][0], position_curr[1][0])
     points = apply_offsets_to_center(data.shape, position_curr, cityblock)
     distances_cityblock = distances[points[:, 0], points[:, 1]]
     distances_to_check = calc_cityblock(position_curr, points)
+    # You can actually filter the distances that are -1, but the numpy is pretty fast for numeric operations so it's not necessary
     a += np.sum((distances_cityblock - distances_to_check - i+1) > 100)
 
 print(a)
