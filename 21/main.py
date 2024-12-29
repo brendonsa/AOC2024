@@ -81,6 +81,7 @@ for d in data:
         curr_button=elem
     presses.append(press)
 
+presses_copy = presses.copy()
 
 for _ in (range(2)):
     for idx, press in enumerate(presses):
@@ -105,3 +106,50 @@ for d,p in zip(data,presses):
     a+= d*(len(p))
 print(a)
 
+
+
+
+presses = presses_copy
+
+# Need to reverse the first solution. Go in Depth first.
+# Memoization is crucial here
+@lru_cache(maxsize=None)
+def get_keypresses(depth,curr_button,elem):
+    if depth == 1:
+        try:
+            # Length would be too wild to handle. Return only a number of presses.
+            # Presses themselves would be analysed in the upper layers.
+            return len(DIRECTIONAL_MAP[curr_button][elem])
+        except KeyError:
+            return 1
+    else:
+        try:
+            key_press = DIRECTIONAL_MAP[curr_button][elem]
+        except KeyError:
+            key_press = 'A'
+        to_ret = 0
+        curr_button = 'A'
+        for k in key_press:
+            to_ret += get_keypresses(depth-1,curr_button,k)
+            curr_button=k
+        return to_ret
+
+
+presses_new = []    
+for p in presses:
+    p_new = 0
+    curr_button = 'A'
+    for p_ in p:
+        p_new += get_keypresses(25,curr_button,p_)
+        curr_button = p_
+    presses_new.append(p_new)
+
+
+
+a = 0
+for d,p in zip(data,presses_new):
+    d = d.lstrip('0').rstrip('A')
+    d = int(d)
+    print(d, p)
+    a+= d*(p)
+print(a)
